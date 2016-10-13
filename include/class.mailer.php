@@ -521,6 +521,87 @@ class Mailer {
         $body = $mime->get($encodings);
         //encode the headers.
         $headers = $mime->headers($headers, true);
+        
+        // Is an external script configured through which the email should
+        // be piped?
+        if ( ! is_null ($this->getEmail()) && ($cmd = $this->getEmail()->getPipeCommand())) {
+            $proc = proc_open(
+                $cmd, 
+                array(
+                    0 => array('pipe', 'r'),	// stdin for the script
+                    1 => array('pipe', 'w'),	// stdout for the script
+                    2 => array('pipe', 'w')	// stderr for the script
+                ),
+                $pipes
+            );
+            if (is_resource($proc)) {
+                // Write the email to stdin
+                
+                foreach($headers as $name => $value) {
+                    fwrite($pipes[0], $name . ': ' . $value . "\r\n");
+                }
+                fwrite($pipes[0], "\r\n");
+                fwrite($pipes[0], $body);                
+                fclose($pipes[0]);
+                
+                // Read the output from stdout and stderr
+                $proc_output = stream_get_contents($pipes[1]);
+                $proc_errors = stream_get_contents($pipes[2]);
+                fclose($pipes[1]);
+                fclose($pipes[2]);
+                
+                // Retrieve the process exit status.
+                $exit = proc_close($proc);
+                
+                if ((!$proc_errors) && ($exit == 0)) {
+                
+                    // Eeverything went fine.
+                    if ($this->getEmail()->pipeCommandSendsMail()) {
+                    
+                        // The script sent the email, so we're done.
+                        return $messageId;
+                         
+                    } else {
+                    
+                        // Use the output from the script as the new email
+                        // to be sent. Not the cleanest way to parse this
+                        // back, I admit.
+                        
+                        $parts = explode("\r\n\r\n", $proc_output, 2);
+                        $body = $parts[1];
+                        $headers = array();
+                        $current_header;
+                        $leftover_header_stuff = '';
+                        foreach(explode("\r\n", $parts[0]) as $headerline) {
+                            if (preg_match('/^(\S+)\s*:\s*(.+)/s', $headerline, $m)) {
+                                $current_header = $m[1];
+                                $headers[$current_header] = $m[2];
+                            } else if ($current_header) {
+                                $headers[$current_header] .= "\r\n" . $headerline;
+                            } else {	// Should not happen normally.
+                                $leftover_header_stuff .= $headerline;
+                            }
+                        }
+                        $body = $leftover_header_stuff . $body;
+                    }
+                    
+                } else {
+                
+                    // Something went wrong. We log the error and just
+                    // continue as though the script was not there at all.
+                    
+                    $alert=_S("An error occurred while sending email through the external script") . ': ' . $cmd; 
+                    if ($proc_errors) {
+                        $alert .= ' (' . $proc_errors . ')';
+                    }
+                    if ($exit) {
+                        $alert .= ', exit status ' . $exit;
+                    }
+                    $this->logError($alert);
+                    
+                }
+            }
+        }
 
         // Cache smtp connections made during this request
         static $smtp_connections = array();

@@ -317,6 +317,39 @@ $info=Format::htmlchars(($errors && $_POST)?$_POST:$info);
                 <i class="help-tip icon-question-sign" href="#header_spoofing"></i>
             </td>
         </tr>
+        
+        <tr>
+            <th colspan="2">
+                <em><strong><?php echo __('Email Pipe Script'); ?></strong>
+                &nbsp;<i class="help-tip icon-question-sign" href="#email_pipe_settings"></i>
+                &nbsp;<font class="error">&nbsp;<?php echo $errors['pipe']; ?></font></em>
+            </th>
+        </tr>
+        <tr><td><?php echo __('Status');?></td>
+            <td>
+                <label><input type="radio" name="pipe_command_active" value="1" <?php echo $info['pipe_command_active']?'checked':''; ?> />&nbsp;<?php echo __('Enable');?></label>
+                &nbsp;
+                <label><input type="radio" name="pipe_command_active" value="0" <?php echo !$info['pipe_command_active']?'checked':''; ?> />&nbsp;<?php echo __('Disable');?></label>
+                &nbsp;<font class="error">&nbsp;<?php echo $errors['pipe_command_active']; ?></font>
+            </td>
+        </tr>
+        <tr><td><?php echo __('Command'); ?></td>
+            <td><input type="text" name="pipe_command" size=35 value="<?php echo $info['pipe_command']; ?>">
+                &nbsp;<font class="error"><?php echo $errors['pipe_command']; ?></font>
+			<i class="help-tip icon-question-sign" href="#pipe_command"></i>
+            </td>
+        </tr>
+        <tr>
+            <td width="180">
+                <?php echo __('Sends Email'); ?>
+            </td>
+            <td>
+                <label><input type="checkbox" name="pipe_command_sends_email" value="1" <?php echo $info['pipe_command_sends_email']?'checked="checked"':''; ?> >
+                <?php echo __('The script takes care of sending the email; it does not need any further processing'); ?>
+                </label>
+            </td>
+        </tr>
+                
         <tr>
             <th colspan="2">
                 <em><strong><?php echo __('Internal Notes');?></strong>: <?php

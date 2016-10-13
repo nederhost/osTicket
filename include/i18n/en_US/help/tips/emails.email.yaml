@@ -136,3 +136,18 @@ header_spoofing:
         This advanced setting is generally used when sending mail from
         aliases of this mail box.
 
+email_pipe_settings:
+    title: Send Email to an External Script for Processing
+    content: >
+        Emails can be sent to an external script to allow for additional
+        processing such as adding electronic signatures.  This script must
+        accept the entire email on STDIN and either send the email itself
+        (in which case the checkbox for this needs to be checked) or output
+        it on STDOUT.
+
+pipe_command:
+    title: Script for Processing Email
+    content: >
+        Full path to the script that will process email sent from this
+        address.  The user running osTicket needs to have execute
+        permissions for this script.

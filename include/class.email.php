@@ -93,6 +93,14 @@ class Email extends VerySimpleModel {
     function getDept() {
         return $this->dept;
     }
+    
+    function getPipeCommand() {
+        return $this->pipe_command_active ? $this->pipe_command : '';
+    }
+    
+    function pipeCommandSendsMail() {
+        return $this->pipe_command_sends_email;
+    }
 
     function getTopicId() {
         return $this->topic_id;
@@ -382,6 +390,9 @@ class Email extends VerySimpleModel {
         $this->dept_id = $vars['dept_id'];
         $this->priority_id = $vars['priority_id'];
         $this->topic_id = $vars['topic_id'];
+        $this->pipe_command = $vars['pipe_command'];
+        $this->pipe_command_active = isset($vars['pipe_command_active'])?1:0;
+        $this->pipe_command_sends_email = isset($vars['pipe_command_sends_email'])?1:0;
         $this->noautoresp = isset($vars['noautoresp'])?1:0;
         $this->userid = $vars['userid'];
         $this->mail_active = $vars['mail_active'];
