@@ -10,7 +10,7 @@ class TicketApiController extends ApiController {
     # so that all supported input formats should be supported
     function getRequestStructure($format, $data=null) {
         $supported = array(
-            "alert", "autorespond", "source", "topicId",
+            "alert", "autorespond", "source", "topicId", "deptId",
             "attachments" => array("*" =>
                 array("name", "type", "data", "encoding", "size")
             ),
