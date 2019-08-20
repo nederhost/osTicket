@@ -553,7 +553,7 @@ class Mailer {
                 // Retrieve the process exit status.
                 $exit = proc_close($proc);
                 
-                if ((!$proc_errors) && ($exit == 0)) {
+                if ($exit == 0) {
                 
                     // Eeverything went fine.
                     if ($this->getEmail()->pipeCommandSendsMail()) {
